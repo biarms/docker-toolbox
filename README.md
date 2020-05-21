@@ -19,4 +19,3 @@ Resulting docker images are pushed on [dockerhub](https://hub.docker.com/r/biarm
 ## How to build locally:
 1. Option 1: `make`
 2. Option 2: build as on CI thanks to the circleci cli with `make circleci-local-build`
-
