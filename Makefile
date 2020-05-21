@@ -6,8 +6,7 @@ SHELL = bash
         buildx
 
 # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
-DOCKER_REGISTRY ?=
-# docker.io/
+DOCKER_REGISTRY ?= docker.io/
 # DOCKER_USERNAME: Nothing, or 'biarms'
 DOCKER_USERNAME ?=
 # DOCKER_PASSWORD: Nothing, or '********'
@@ -44,6 +43,9 @@ check-binaries:
 	@ DOCKER_CLI_EXPERIMENTAL=enabled docker manifest --help | grep "docker manifest COMMAND" > /dev/null || (echo "docker manifest is needed. Consider upgrading docker" && exit 4)
 	@ DOCKER_CLI_EXPERIMENTAL=enabled docker version -f '{{.Client.Experimental}}' | grep "true" > /dev/null || (echo "docker experimental mode is not enabled" && exit 5)
 	# Debug info
+	@ echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}"
+	@ echo "BUILD_DATE: ${BUILD_DATE}"
+	@ echo "VCS_REF: ${VCS_REF}"
 	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
 
 check-buildx: check-binaries
