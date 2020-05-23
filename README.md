@@ -16,9 +16,17 @@
 -->
 
 ## Overview
-The goal of this repo is to build a docker image that contains linux tools useful for building, testing and debugging purposes.
+The goal of this project is to build a docker image that contains linux tools useful for building, testing and debugging purposes.
 
-Resulting docker images are pushed on [dockerhub](https://hub.docker.com/r/biarms/docker-toolbox/).
+Resulting docker images are pushed on [docker hub](https://hub.docker.com/r/biarms/docker-toolbox/).
+
+## How to build locally
+1. Option 1: with CircleCI Local CLI:
+   - Install [CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/)
+   - Call `circleci local execute`
+2. Option 2: with make:
+   - Install [GNU make](https://www.gnu.org/software/make/manual/make.html). Version 3.81 (which came out-of-the-box on MacOS) should be OK.
+   - Call `make build`
 
 ## Release notes: 
 
@@ -28,6 +36,7 @@ Resulting docker images are pushed on [dockerhub](https://hub.docker.com/r/biarm
 - Installed binaries are: sudo, curl, wget, make, pwgen, git, gnupg and lsb-release
 - Install docker-ce cli, version 19.03.8
 
-## How to build locally:
-1. Option 1: `make`
-2. Option 2: build as on CI thanks to the circleci cli with `make circleci-local-build`
+### Version 0.0.2
+- Same as 0.0.1, but install docker-ce cli version 19.03.9
+- Refactor the build
+- Improve this README.md documentation
