@@ -2,7 +2,7 @@ SHELL = bash
 # .ONESHELL:
 # .SHELLFLAGS = -e
 # See https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: default all build circleci-local-build check-binaries check-buildx check-docker-login docker-login-if-possible buildx-prepare \
+.PHONY: default all build circleci-local-build check-binaries check-buildx check-docker-login docker-login-if-possible buildx-prepare prepare install-qemu uninstall-qemu \
         buildx
 
 # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
@@ -15,7 +15,7 @@ DOCKER_PASSWORD ?=
 BETA_VERSION ?=
 DOCKER_IMAGE_NAME = biarms/docker-toolbox
 DOCKER_IMAGE_VERSION = 0.0.1
-DOCKER_IMAGE_TAGNAME=${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
+DOCKER_IMAGE_TAGNAME=${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}${BETA_VERSION}
 # See https://www.gnu.org/software/make/manual/html_node/Shell-Function.html
 BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 # See https://microbadger.com/labels
@@ -28,7 +28,7 @@ PLATFORM ?= linux/amd64
 
 default: all
 
-all: build
+all: check-docker-login buildx
 
 build: buildx
 
@@ -46,7 +46,6 @@ check-binaries:
 	@ echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}"
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
-	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
 
 check-buildx: check-binaries
 	# Next line will fail if docker server can't be contacted
@@ -54,17 +53,36 @@ check-buildx: check-binaries
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx version
 
 check-docker-login: check-binaries
-	@ if [[ "${DOCKER_USERNAME}" == "" ]]; then echo "DOCKER_USERNAME and DOCKER_PASSWORD env variables are mandatory for this kind of build"; exit -1; fi
+	@ if [[ "${DOCKER_USERNAME}" == "" ]]; then \
+	    echo "DOCKER_USERNAME and DOCKER_PASSWORD env variables are mandatory for this kind of build"; \
+	    echo "Consider one of these alternatives: "; \
+	    echo "  - make build"; \
+	    echo "  - DOCKER_USERNAME=biarms DOCKER_PASSWORD=******** BETA_VERSION='-local-test-pushed-on-docker-io' make"; \
+	    echo "  - DOCKER_USERNAME=biarms DOCKER_PASSWORD=******** make circleci-local-build"; \
+	    exit -1; \
+	  fi
 
 docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
 
 # See https://docs.docker.com/buildx/working-with-buildx/
-buildx-prepare: check-buildx
+buildx-prepare: prepare install-qemu check-buildx
 	DOCKER_CLI_EXPERIMENTAL=enabled docker context create buildx-multi-arch-context || true
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx create buildx-multi-arch-context --name=buildx-multi-arch || true
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use buildx-multi-arch
 
 buildx: docker-login-if-possible buildx-prepare
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "$(DOCKER_REGISTRY)${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}${BETA_VERSION}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "${DOCKER_IMAGE_TAGNAME}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "$(DOCKER_REGISTRY)${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
+
+prepare: install-qemu
+	# Debug info
+	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
+
+# Test are qemu based. SHOULD_DO: use `docker buildx bake`. See https://github.com/docker/buildx#buildx-bake-options-target
+install-qemu: check-binaries
+	# @ # From https://github.com/multiarch/qemu-user-static:
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+uninstall-qemu: check-binaries
+	docker run --rm --privileged multiarch/qemu-user-static:register --reset

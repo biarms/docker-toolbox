@@ -1,7 +1,19 @@
 # Brothers in ARMs' docker-toolbox
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/biarms/docker-toolbox?label=Latest%20Github%20release&logo=Github)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/biarms/docker-toolbox?include_prereleases&label=Highest%20GitHub%20release&logo=Github&sort=semver)
+
+[![TravisCI build status image](https://img.shields.io/travis/biarms/docker-toolbox/master?label=Travis%20build&logo=Travis)](https://travis-ci.org/biarms/docker-toolbox)
+[![CircleCI build status image](https://img.shields.io/circleci/build/gh/biarms/docker-toolbox/master?label=CircleCI%20build&logo=CircleCI)](https://circleci.com/gh/biarms/docker-toolbox)
+
+[![Docker Pulls image](https://img.shields.io/docker/pulls/biarms/docker-toolbox?logo=Docker)](https://hub.docker.com/r/biarms/docker-toolbox)
+[![Docker Stars image](https://img.shields.io/docker/stars/biarms/docker-toolbox?logo=Docker)](https://hub.docker.com/r/biarms/docker-toolbox)
+[![Highest Docker release](https://img.shields.io/docker/v/biarms/docker-toolbox?label=docker%20release&logo=Docker&sort=semver)](https://hub.docker.com/r/biarms/docker-toolbox)
+
+<!--
 [![Travis build status](https://api.travis-ci.org/biarms/docker-toolbox.svg?branch=master)](https://travis-ci.org/biarms/docker-toolbox) 
 [![CircleCI build status](https://circleci.com/gh/biarms/docker-toolbox.svg?style=svg)](https://circleci.com/gh/biarms/docker-toolbox)
+-->
 
 ## Overview
 The goal of this repo is to build a docker image that contains linux tools useful for building, testing and debugging purposes.
