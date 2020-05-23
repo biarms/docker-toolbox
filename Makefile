@@ -28,7 +28,7 @@ PLATFORM ?= linux/amd64
 
 default: all
 
-all: check-docker-login buildx
+all: check-docker-login build uninstall-qemu
 
 build: buildx
 
