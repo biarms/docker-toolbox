@@ -21,24 +21,12 @@ RUN apt-get update \
 ARG ARCH=amd64
 
 # Install docker-ce, according to https://docs.docker.com/engine/install/ubuntu/
-#
-# !!!!! WARNING !!!!: installing docker 19.03.9 client may produce "Error response from daemon: client version 1.40 is too new. Maximum supported API version is 1.39" error with docker server 18.09.3,
-# which is the max docker version of CircleCI, according to https://circleci.com/docs/2.0/building-docker-images/), as discussed via
-# https://github.com/kubernetes-sigs/kubespray/issues/6160. So we want to stick to 19.03.8.
-# But on the docker repo of ubuntu focal, there is only "19.03.9".
-# To check this, compare these 2 URLs:
-#  - https://download.docker.com/linux/ubuntu/dists/bionic/pool/stable/amd64/
-#  - https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/
-# So let's use the "bionic" ubuntu repo !
-# !!!!! SHOULD_DO !!!!! (in the future, when upgrading docker):
-# Replace add-apt-repository "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu bionic stable" \
-# to      add-apt-repository "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
- && add-apt-repository "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu bionic stable" \
+ && add-apt-repository "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
  && apt-get update \
  && apt-cache madison docker-ce-cli \
  && DEBIAN_FRONTEND="noninteractive" sudo apt-get install -y \
-                   docker-ce-cli=5:19.03.8* \
+                   docker-ce-cli=5:19.03.9* \
  && sudo apt autoremove \
  && rm -rf /var/lib/apt/lists/*
 
