@@ -15,7 +15,7 @@ DOCKER_PASSWORD ?=
 BETA_VERSION ?=
 DOCKER_IMAGE_NAME = biarms/docker-toolbox
 DOCKER_IMAGE_VERSION = 0.0.2
-DOCKER_IMAGE_TAGNAME=${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}${BETA_VERSION}
+DOCKER_IMAGE_TAGNAME = ${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}${BETA_VERSION}
 # See https://www.gnu.org/software/make/manual/html_node/Shell-Function.html
 BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 # See https://microbadger.com/labels
