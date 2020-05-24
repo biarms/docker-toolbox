@@ -46,11 +46,8 @@ check-binaries:
 	@ echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}"
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
-
-check-buildx: check-binaries
 	# Next line will fail if docker server can't be contacted
 	docker version
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx version
 
 check-docker-login: check-binaries
 	@ if [[ "${DOCKER_USERNAME}" == "" ]]; then \
@@ -65,20 +62,6 @@ check-docker-login: check-binaries
 docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
 
-# See https://docs.docker.com/buildx/working-with-buildx/
-buildx-prepare: prepare install-qemu check-buildx
-	DOCKER_CLI_EXPERIMENTAL=enabled docker context create buildx-multi-arch-context || true
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx create buildx-multi-arch-context --name=buildx-multi-arch || true
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use buildx-multi-arch
-
-buildx: docker-login-if-possible buildx-prepare
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "${DOCKER_IMAGE_TAGNAME}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "$(DOCKER_REGISTRY)${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
-
-prepare: install-qemu
-	# Debug info
-	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
-
 # Test are qemu based. SHOULD_DO: use `docker buildx bake`. See https://github.com/docker/buildx#buildx-bake-options-target
 install-qemu: check-binaries
 	# @ # From https://github.com/multiarch/qemu-user-static:
@@ -86,3 +69,18 @@ install-qemu: check-binaries
 
 uninstall-qemu: check-binaries
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
+# See https://docs.docker.com/buildx/working-with-buildx/
+check-buildx: check-binaries
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx version
+
+buildx-prepare: install-qemu check-buildx
+	DOCKER_CLI_EXPERIMENTAL=enabled docker context create buildx-multi-arch-context || true
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx create buildx-multi-arch-context --name=buildx-multi-arch || true
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use buildx-multi-arch
+	# Debug info
+	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
+
+buildx: docker-login-if-possible buildx-prepare
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "${DOCKER_IMAGE_TAGNAME}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --progress plain -f Dockerfile --push --platform "${PLATFORM}" --tag "$(DOCKER_REGISTRY)${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" .
