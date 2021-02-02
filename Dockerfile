@@ -1,4 +1,4 @@
-FROM ubuntu:focal-20200423
+FROM ubuntu:focal-20210119
 
 # To avoid tzdata installation 'issue': https://serverfault.com/questions/949991/how-to-install-tzdata-on-a-ubuntu-docker-image
 RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
@@ -26,7 +26,7 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
  && apt-get update \
  && apt-cache madison docker-ce-cli \
  && DEBIAN_FRONTEND="noninteractive" sudo apt-get install -y \
-                   docker-ce-cli=5:19.03.9* \
+                   docker-ce-cli=5:20.10.3* \
  && sudo apt autoremove \
  && rm -rf /var/lib/apt/lists/*
 

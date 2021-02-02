@@ -40,3 +40,8 @@ Resulting docker images are pushed on [docker hub](https://hub.docker.com/r/biar
 - Same as 0.0.1, but install docker-ce cli version 19.03.9
 - Refactor the build
 - Improve this README.md documentation
+
+### Version 0.0.3
+- Same as 0.0.2, but install docker-ce cli version 20.10.3
+- Refactor the build
+- Improve this README.md documentation
