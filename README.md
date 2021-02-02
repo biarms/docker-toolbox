@@ -23,9 +23,12 @@ Resulting docker images are pushed on [docker hub](https://hub.docker.com/r/biar
 ## How to build locally
 1. Option 1: with CircleCI Local CLI:
    - Install [CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/)
-   - Call `circleci local execute`
+   - Call `circleci local execute -e DOCKER_USERNAME=******** -e DOCKER_PASSWORD=********`
 2. Option 2: with make:
    - Install [GNU make](https://www.gnu.org/software/make/manual/make.html). Version 3.81 (which came out-of-the-box on MacOS) should be OK.
+   - Call `DOCKER_USERNAME=******** DOCKER_PASSWORD=******** make circleci-local-build`
+   - Call `DOCKER_USERNAME=******** DOCKER_PASSWORD=******** make`
+   - Call `docker login && make build`
    - Call `make build`
 
 ## Release notes: 
