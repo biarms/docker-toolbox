@@ -9,7 +9,7 @@ jobs:
           version: 20.10.11 #19.03.13 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
       - run: docker version
       - checkout
-      - command: |
+      - run: |
           if [ "${CIRCLE_BRANCH}" == "master" ];
             make
           else
