@@ -53,3 +53,6 @@ Resulting docker images are pushed on [docker hub](https://hub.docker.com/r/biar
 - Same as 0.0.3, but install docker-ce cli version 20.10.11
 - Base image is ubuntu:20.04 (2021-10-06)
 
+### Version 0.0.5
+- Same as 0.0.4, but install docker-ce cli version 20.10.14
+- Base image is ubuntu:20.04 (2022-03-16)
